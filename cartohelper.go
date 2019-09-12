@@ -9,10 +9,11 @@ import (
 
 func main() {
     app := app.New()
-    mapwidget := mapWidget.MapWidget{}
 
 	w := app.NewWindow("Hello")
-    ui := ui.CreateUi(&mapwidget)
+    c := w.Canvas()
+    mapwidget := mapWidget.MapWidget{Scale: c.Scale()}
+    ui := ui.NewUi(&mapwidget)
 	w.SetContent(widget.NewVBox(
 		ui.GetHBox(),
 		widget.NewButton("Quit", func() {

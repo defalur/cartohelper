@@ -20,7 +20,7 @@ type SimpleUi struct {
     mapWidget *mapWidget.MapWidget
 }
 
-func CreateUi(mapWidget *mapWidget.MapWidget) *SimpleUi {
+func NewUi(mapWidget *mapWidget.MapWidget) *SimpleUi {
     result := &SimpleUi{mapWidget: mapWidget}
     hbox := widget.NewHBox()
     result.menu = widget.NewVBox()

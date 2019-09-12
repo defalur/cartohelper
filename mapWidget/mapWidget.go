@@ -19,6 +19,7 @@ type MapWidget struct {
     hidden bool
     clickx int
     clicky int
+    Scale float32
 }
 
 func (m *MapWidget) Size() fyne.Size {
@@ -91,11 +92,12 @@ func (r *MapWidgetRenderer) Destroy() {
 
 func (r *MapWidgetRenderer) draw(w, h int) image.Image {
     im := image.NewRGBA(image.Rect(0, 0, w, h))
+    scale := r.state.Scale
     
     for i := 0; i < h; i++ {
         for j := 0; j < w; j++ {
             var c color.Color
-            if j == r.state.clickx && i == r.state.clicky {
+            if j == int(float32(r.state.clickx) * scale) && i == int(float32(r.state.clicky) * scale) {
                 c = color.RGBA{0, 255, 128, 255}
             } else {
                 c = color.RGBA{255, 0, 128, 255}
@@ -121,6 +123,8 @@ func (m *MapWidget) CreateRenderer() fyne.WidgetRenderer {
 func (m *MapWidget) Tapped(ev *fyne.PointEvent) {
     m.clickx = ev.Position.X
     m.clicky = ev.Position.Y
+    fmt.Print("x: ", m.clickx, " y:", m.clicky, "\n")
+    fmt.Println("size: ", m.size)
     widget.Refresh(m)
 }
 
