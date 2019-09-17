@@ -9,10 +9,6 @@ import (
     "image/color"
 )
 
-type MapState interface {
-    NewMap()
-}
-
 type MapWidget struct {
     size fyne.Size
     position fyne.Position
