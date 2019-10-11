@@ -4,23 +4,30 @@ import (
     
 )
 
-IMapNode interface {
-    GetHeight() float32
-    SetHeight(height float32)
+type MapNode interface {
+    GetHeight() int
+    SetHeight(height int)
     //getters and setters for humidity and biome
     Neighbours() []MapNode
 }
 
-TileMapNode struct {
-    height float32
-    neighbours [8]MapNode
+type TileMapNode struct {
+    height int
+    neighbours []MapNode
 }
 
-func (n *TileMapNode) GetHeight() float32 {
+func NewTileMapNode(height int) TileMapNode {
+    result := TileMapNode{height: height}
+    result.neighbours = make([]MapNode, 0, 8)
+    
+    return result
+}
+
+func (n *TileMapNode) GetHeight() int {
     return n.height
 }
 
-func (n *TileMapNode) SetHeight(height float32) {
+func (n *TileMapNode) SetHeight(height int) {
     n.height = height
 }
 
