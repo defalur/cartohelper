@@ -31,6 +31,22 @@ func NewUi(mapWidget *mapWidget.MapWidget) *SimpleUi {
     result.menu.Append(widget.NewButton("Useless Button", func() {
         fmt.Println("Useless")
     }))
+    result.menu.Append(widget.NewButton("Add blob", func() {
+        mapWidget.MapViewer.MapState().GenerateBlob()
+        widget.Refresh(mapWidget)
+    }))
+    result.menu.Append(widget.NewButton("Add 10 blob", func() {
+        for i := 0; i < 10; i++ {
+            mapWidget.MapViewer.MapState().GenerateBlob()
+        }
+        widget.Refresh(mapWidget)
+    }))
+    result.menu.Append(widget.NewButton("Add 100 blob", func() {
+        for i := 0; i < 100; i++ {
+            mapWidget.MapViewer.MapState().GenerateBlob()
+        }
+        widget.Refresh(mapWidget)
+    }))
     
     return result
 }

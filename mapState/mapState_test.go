@@ -69,3 +69,11 @@ func TestNodeNeighbours(t *testing.T) {
         t.Errorf("node2.GetHeight() returned %d, expected 42.", node2.GetHeight())
     }
 }
+
+func TestBlobMaxHeight(t *testing.T) {
+    state := NewTileMapState(10, 10)
+    
+    
+    node1, _ := state.GetNode(5, 5)
+    
+}

@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-    mapState := mapstate.NewTileMapState(300, 300)
+    mapState := mapstate.NewTileMapState(600, 600, -20)
     mapViewer := mapviewer.NewSimpleMapViewer()
     mapViewer.RegisterMap(mapState)
     

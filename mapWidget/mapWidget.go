@@ -62,7 +62,8 @@ type MapWidgetRenderer struct {
 }
 
 func (r *MapWidgetRenderer) MinSize() fyne.Size {
-    return fyne.NewSize(300, 300)
+    return fyne.NewSize(r.state.MapViewer.MapState().GetWidth(),
+                        r.state.MapViewer.MapState().GetHeight())
 }
 
 func (r *MapWidgetRenderer) Layout(size fyne.Size) {
