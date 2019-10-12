@@ -1,4 +1,4 @@
-package mapState
+package mapstate
 
 import (
     "errors"

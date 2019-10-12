@@ -1,9 +1,12 @@
-package mapViewer
+package mapviewer
 
 import (
-    
+    "cartohelper/mapState"
+    "image/color"
 )
 
-IMapViewer interface {
-    RegisterMap(map IMapState*)
+type MapViewer interface {
+    RegisterMap(state mapstate.MapState)
+    GetPixel(x, y int) color.Color
+    MapState() mapstate.MapState
 }

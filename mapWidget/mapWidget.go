@@ -7,6 +7,7 @@ import (
     "fyne.io/fyne/canvas"
     "image"
     "image/color"
+    "cartohelper/mapViewer"
 )
 
 type MapWidget struct {
@@ -16,6 +17,7 @@ type MapWidget struct {
     clickx int
     clicky int
     Scale float32
+    MapViewer mapviewer.MapViewer
 }
 
 func (m *MapWidget) Size() fyne.Size {
@@ -60,7 +62,7 @@ type MapWidgetRenderer struct {
 }
 
 func (r *MapWidgetRenderer) MinSize() fyne.Size {
-    return fyne.NewSize(128, 64)
+    return fyne.NewSize(300, 300)
 }
 
 func (r *MapWidgetRenderer) Layout(size fyne.Size) {
@@ -76,6 +78,7 @@ func (r *MapWidgetRenderer) BackgroundColor() color.Color {
 }
 
 func (r *MapWidgetRenderer) Refresh() {
+    r.Layout(r.state.Size())
     canvas.Refresh(r.render)
 }
 
@@ -93,11 +96,9 @@ func (r *MapWidgetRenderer) draw(w, h int) image.Image {
     for i := 0; i < h; i++ {
         for j := 0; j < w; j++ {
             var c color.Color
-            if j == int(float32(r.state.clickx) * scale) && i == int(float32(r.state.clicky) * scale) {
-                c = color.RGBA{0, 255, 128, 255}
-            } else {
-                c = color.RGBA{255, 0, 128, 255}
-            }
+            x := 1/scale * float32(j)
+            y := 1/scale * float32(i)
+            c = r.state.MapViewer.GetPixel(int(x), int(y))
             im.Set(j, i,
                    c)
         }
