@@ -6,7 +6,7 @@ import (
     //"fyne.io/fyne/theme"
     "fyne.io/fyne/widget"
     "cartohelper/mapWidget"
-    
+    "cartohelper/genutils"
     "fmt"
 )
 
@@ -28,23 +28,38 @@ func NewUi(mapWidget *mapWidget.MapWidget) *SimpleUi {
     hbox.Append(mapWidget)
     result.hbox = hbox
     
+    w := mapWidget.MapViewer.MapState().GetWidth()
+    h := mapWidget.MapViewer.MapState().GetHeight()
+    
     result.menu.Append(widget.NewButton("Useless Button", func() {
         fmt.Println("Useless")
     }))
     result.menu.Append(widget.NewButton("Add blob", func() {
-        mapWidget.MapViewer.MapState().GenerateBlob()
+        mapWidget.MapViewer.MapState().GenerateBlob(0, 0, w, h)
         widget.Refresh(mapWidget)
     }))
     result.menu.Append(widget.NewButton("Add 10 blob", func() {
         for i := 0; i < 10; i++ {
-            mapWidget.MapViewer.MapState().GenerateBlob()
+            mapWidget.MapViewer.MapState().GenerateBlob(0, 0, w, h)
         }
         widget.Refresh(mapWidget)
     }))
     result.menu.Append(widget.NewButton("Add 100 blob", func() {
         for i := 0; i < 100; i++ {
-            mapWidget.MapViewer.MapState().GenerateBlob()
+            mapWidget.MapViewer.MapState().GenerateBlob(0, 0, w, h)
         }
+        widget.Refresh(mapWidget)
+    }))
+    result.menu.Append(widget.NewButton("Add continent", func() {
+        continent := genutils.NewContinent(w, h)
+        
+        for i := continent.NBlob; i > 0; i-- {
+            mapWidget.MapViewer.MapState().GenerateBlob(continent.X,
+                                                        continent.Y,
+                                                        continent.Width,
+                                                        continent.Height)
+        }
+        
         widget.Refresh(mapWidget)
     }))
     

@@ -5,7 +5,7 @@ import (
 )
 
 type MapState interface {
-    GenerateBlob() (int, int)//find parameters
+    GenerateBlob(x, y, w, h int) (int, int)//find parameters
     GetNode(x, y int) (MapNode, error)//position in integer coordinates?, also return node position
     GetWidth() int
     GetHeight() int

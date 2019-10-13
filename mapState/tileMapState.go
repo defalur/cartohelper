@@ -29,7 +29,7 @@ func NewTileMapState(width, height, baseHeight int) MapState {
         }
     }
     
-    rand.Seed(0)
+    rand.Seed(1)
     return result
 }
 
@@ -56,14 +56,14 @@ func (state *TileMapState) EndBlob() {
     }
 }
 
-func (state *TileMapState) GenerateBlob() (height, width int) {    
-    width = rand.Intn(40 - 5) + 5//random in [3; 15[ range
-    height = rand.Intn(30 - 5) + 5//random in [5; 20[
+func (state *TileMapState) GenerateBlob(x, y, w, h int) (posx, posy int) {    
+    width := rand.Intn(40 - 5) + 5//random in [3; 15[ range
+    height := rand.Intn(30 - 5) + 5//random in [5; 20[
     curHeight := float32(height)
     slope := curHeight / float32(width)
     
-    posx := rand.Intn(state.width)
-    posy := rand.Intn(state.height)
+    posx = rand.Intn(w) + x
+    posy = rand.Intn(h) + y
     
     node, _ := state.GetNode(posx, posy)//position is always valid
     q := queue.New(0)
