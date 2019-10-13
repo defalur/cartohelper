@@ -8,6 +8,8 @@ import (
     "image"
     "image/color"
     "cartohelper/mapViewer"
+    "os"
+    "image/png"
 )
 
 type MapWidget struct {
@@ -18,6 +20,13 @@ type MapWidget struct {
     clicky int
     Scale float32
     MapViewer mapviewer.MapViewer
+    lastImage *image.RGBA
+}
+
+func (m *MapWidget) SaveImg(name string) {
+    out, _ := os.Create(name + ".png")
+    
+    png.Encode(out, m.lastImage)
 }
 
 func (m *MapWidget) Size() fyne.Size {
@@ -104,6 +113,7 @@ func (r *MapWidgetRenderer) draw(w, h int) image.Image {
                    c)
         }
     }
+    r.state.lastImage = im
     return im
 }
 

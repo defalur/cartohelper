@@ -13,6 +13,7 @@ func main() {
     mapState := mapstate.NewTileMapState(600, 600, -20)
     mapViewer := mapviewer.NewSimpleMapViewer()
     mapViewer.RegisterMap(mapState)
+    mapState.Seed(3)
     
     app := app.New()
 

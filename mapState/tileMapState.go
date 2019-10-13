@@ -4,10 +4,14 @@ import (
     "errors"
     "math/rand"
     "github.com/golang-collections/go-datastructures/queue"
+    "cartohelper/genutils"
+    "math"
+    "fmt"
 )
 
 type TileMapState struct {
     nodes [][]TileMapNode
+    probMap [][]float64 //probability map for 
     width int
     height int
 }
@@ -15,11 +19,14 @@ type TileMapState struct {
 func NewTileMapState(width, height, baseHeight int) MapState {
     result := &TileMapState{width:width, height:height}
     result.nodes = make([][]TileMapNode, height)
+    result.probMap = make([][]float64, height)
     for i := 0; i < height; i++ {
         result.nodes[i] = make([]TileMapNode, width)
+        result.probMap[i] = make([]float64, width)
         
         for j := 0; j < width; j++ {
             result.nodes[i][j] = NewTileMapNode(baseHeight)//TODO: baseHeight broke all tests
+            result.probMap[i][j] = 0.0
         }
     }
     
@@ -29,7 +36,7 @@ func NewTileMapState(width, height, baseHeight int) MapState {
         }
     }
     
-    rand.Seed(1)
+    rand.Seed(0)
     return result
 }
 
@@ -48,6 +55,45 @@ func (state *TileMapState) Seed(seed int) {
     rand.Seed(int64(seed))
 }
 
+func (state *TileMapState) AddDistributionBlob(x, y int, radius float64) {
+    modMap := make(map[string]bool)
+    
+    origin := genutils.Vector2{X: x, Y: y}
+    curPoint := genutils.Vector2{X: x, Y: y}
+    q := queue.New(0)
+    q.Put(curPoint)
+    
+    pointAdd := func(x, y int, curPoint genutils.Vector2) {
+        p := genutils.Vector2{X: curPoint.X + x, Y: curPoint.Y + y}
+        pString := fmt.Sprintf("%d:%d", p.X, p.Y)
+        mag := genutils.Magnitude(origin, p)
+        //fmt.Println("Add: ", p, "pString: ", pString)
+        if mag < radius && !modMap[pString] {
+            modMap[pString] = true
+            state.probMap[p.X][p.Y] = math.Max(1 - mag / radius, state.probMap[p.X][p.Y])
+            q.Put(p)
+        }
+    }
+    
+    for ;!q.Empty(); {
+        tmp, _ := q.Get(1)
+        curPoint, _ = tmp[0].(genutils.Vector2)
+        
+        if curPoint.X > 0 {
+           pointAdd(-1, 0, curPoint)
+        }
+        if curPoint.X < state.width - 1 {
+            pointAdd(1, 0, curPoint)
+        }
+        if curPoint.Y > 0 {
+            pointAdd(0, -1, curPoint)
+        }
+        if curPoint.Y < state.height - 1 {
+            pointAdd(0, 1, curPoint)
+        }
+    }
+}
+
 func (state *TileMapState) EndBlob() {
     for i := 0; i < state.height; i++ {
         for j := 0; j < state.width; j++ {
@@ -62,8 +108,23 @@ func (state *TileMapState) GenerateBlob(x, y, w, h int) (posx, posy int) {
     curHeight := float32(height)
     slope := curHeight / float32(width)
     
+    posRetries := 3
+    
     posx = rand.Intn(w) + x
     posy = rand.Intn(h) + y
+    lastProb := state.probMap[posx][posy]
+    
+    for i := 0; i < posRetries; i++ {
+        tmpx := rand.Intn(w) + x
+        tmpy := rand.Intn(h) + y
+        curProb := state.probMap[tmpx][tmpy]
+        
+        if curProb > lastProb {
+            posx = tmpx
+            posy = tmpy
+            lastProb = curProb
+        }
+    }
     
     node, _ := state.GetNode(posx, posy)//position is always valid
     q := queue.New(0)

@@ -10,5 +10,6 @@ type MapState interface {
     GetWidth() int
     GetHeight() int
     Seed(seed int)
+    AddDistributionBlob(x, y int, radius float64)
     //add ctl function if necessary
 }

@@ -8,6 +8,7 @@ import (
     "cartohelper/mapWidget"
     "cartohelper/genutils"
     "fmt"
+    "strconv"
 )
 
 type Ui interface {
@@ -31,8 +32,15 @@ func NewUi(mapWidget *mapWidget.MapWidget) *SimpleUi {
     w := mapWidget.MapViewer.MapState().GetWidth()
     h := mapWidget.MapViewer.MapState().GetHeight()
     
+    imgCount := 0
+    
     result.menu.Append(widget.NewButton("Useless Button", func() {
         fmt.Println("Useless")
+    }))
+    result.menu.Append(widget.NewButton("Save", func() {
+        mapWidget.SaveImg("image_" + strconv.Itoa(imgCount))
+        fmt.Println("Saved: image_", imgCount)
+        imgCount++
     }))
     result.menu.Append(widget.NewButton("Add blob", func() {
         mapWidget.MapViewer.MapState().GenerateBlob(0, 0, w, h)
@@ -52,6 +60,10 @@ func NewUi(mapWidget *mapWidget.MapWidget) *SimpleUi {
     }))
     result.menu.Append(widget.NewButton("Add continent", func() {
         continent := genutils.NewContinent(w, h)
+        
+        for _, p := range continent.Probs {
+            mapWidget.MapViewer.MapState().AddDistributionBlob(p.X, p.Y, p.Radius)
+        }
         
         for i := continent.NBlob; i > 0; i-- {
             mapWidget.MapViewer.MapState().GenerateBlob(continent.X,
