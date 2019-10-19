@@ -14,6 +14,8 @@ type TileMapState struct {
     probMap [][]float64 //probability map for 
     width int
     height int
+    maxHeight int
+    minHeight int
 }
 
 func NewTileMapState(width, height, baseHeight int) MapState {
@@ -36,6 +38,7 @@ func NewTileMapState(width, height, baseHeight int) MapState {
         }
     }
     
+    result.maxHeight = baseHeight
     rand.Seed(0)
     return result
 }
@@ -70,7 +73,7 @@ func (state *TileMapState) AddDistributionBlob(x, y int, radius float64) {
         //fmt.Println("Add: ", p, "pString: ", pString)
         if mag < radius && !modMap[pString] {
             modMap[pString] = true
-            state.probMap[p.X][p.Y] = math.Max(1 - mag / radius, state.probMap[p.X][p.Y])
+            state.probMap[p.Y][p.X] = math.Max(1 - mag / radius, state.probMap[p.Y][p.X])
             q.Put(p)
         }
     }
@@ -94,6 +97,13 @@ func (state *TileMapState) AddDistributionBlob(x, y int, radius float64) {
     }
 }
 
+func (state *TileMapState) GetDistribution(x, y int) float64 {
+    if x < 0 || y < 0 || x >= state.width || y >= state.height {
+        return 0.0
+    }
+    return state.probMap[y][x]
+}
+
 func (state *TileMapState) EndBlob() {
     for i := 0; i < state.height; i++ {
         for j := 0; j < state.width; j++ {
@@ -112,12 +122,12 @@ func (state *TileMapState) GenerateBlob(x, y, w, h int) (posx, posy int) {
     
     posx = rand.Intn(w) + x
     posy = rand.Intn(h) + y
-    lastProb := state.probMap[posx][posy]
+    lastProb := state.probMap[posy][posx]
     
     for i := 0; i < posRetries; i++ {
         tmpx := rand.Intn(w) + x
         tmpy := rand.Intn(h) + y
-        curProb := state.probMap[tmpx][tmpy]
+        curProb := state.probMap[tmpy][tmpx]
         
         if curProb > lastProb {
             posx = tmpx
@@ -143,6 +153,12 @@ func (state *TileMapState) GenerateBlob(x, y, w, h int) (posx, posy int) {
             q.Put(nil)
         } else {
             curNode.SetHeight(curNode.GetHeight() + int(curHeight))
+            if curNode.GetHeight() > state.maxHeight {
+                state.maxHeight = curNode.GetHeight()
+            }
+            if curNode.GetHeight() < state.minHeight {
+                state.minHeight = curNode.GetHeight()
+            }
             for _, n := range curNode.Neighbours() {
                 if !n.Modified() {
                     q.Put(n)
@@ -169,4 +185,12 @@ func (state *TileMapState) GetWidth() int {
 
 func (state *TileMapState) GetHeight() int {
     return state.height
+}
+
+func (state *TileMapState) MaxHeight() int {
+    return state.maxHeight
+}
+
+func (state *TileMapState) MinHeight() int {
+    return state.minHeight
 }
