@@ -18,6 +18,36 @@ type TileMapState struct {
     minHeight int
 }
 
+type TileMapIterator struct {
+    x int
+    y int
+    state *TileMapState
+}
+
+func (it *TileMapIterator) GetPos() (int, int) {
+    return it.x, it.y
+}
+
+func newTileMapIterator(state *TileMapState) MapIterator {
+    ret := &TileMapIterator{x: 0, y: 0, state: state}
+    
+    return ret
+}
+
+func (it *TileMapIterator) Next() (MapNode, error) {
+    ret, err := it.state.GetNode(it.x, it.y)
+    
+    if err == nil {
+        it.x++
+        if it.x >= it.state.GetWidth() {
+            it.x = 0
+            it.y++
+        }
+    }
+    
+    return ret, err
+}
+
 func NewTileMapState(width, height, baseHeight int) MapState {
     result := &TileMapState{width:width, height:height}
     result.nodes = make([][]TileMapNode, height)
@@ -193,4 +223,8 @@ func (state *TileMapState) MaxHeight() int {
 
 func (state *TileMapState) MinHeight() int {
     return state.minHeight
+}
+
+func (state *TileMapState) GetIterator() MapIterator {
+    return newTileMapIterator(state)
 }

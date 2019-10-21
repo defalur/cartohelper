@@ -10,6 +10,7 @@ import (
     "cartohelper/mapViewer"
     "fmt"
     "strconv"
+    "cartohelper/algorithms"
 )
 
 type Ui interface {
@@ -102,6 +103,10 @@ func NewUi(mapWidget *mapWidget.MapWidget) *SimpleUi {
             mapWidget.MapViewer.MapState().AddDistributionBlob(p.X, p.Y, p.Radius)
         }
         
+        widget.Refresh(mapWidget)
+    }))
+    result.menu.Append(widget.NewButton("Simple erosion", func() {
+        algorithms.SimpleErosion(mapWidget.MapViewer.MapState(), 1)
         widget.Refresh(mapWidget)
     }))
     
