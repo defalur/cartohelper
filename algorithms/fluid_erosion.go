@@ -57,6 +57,14 @@ func computeOutFlux(i, j int, mapData [][]tileData, h, w int) {
         deltaHeight := mapData[i][j].height + mapData[i][j].water - neighbour.height - neighbour.water
         mapData[i][j].outRight = computeFlow(mapData[i][j].outRight, deltaHeight)
     }
+    //scale down if necessary
+    n := mapData[i][j]
+    scale := math.Min(1, (n.water * l * l) /
+                ((n,outTop + n.outBot + n.outLeft + n.outRight) * deltaTime))
+    mapData[i][j].outTop *= scale
+    mapData[i][j].outBot *= scale
+    mapData[i][j].outLeft *= scale
+    mapData[i][j].outRight *= scale
 }
 
 //============== Utility functions ======================
