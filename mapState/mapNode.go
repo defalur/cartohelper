@@ -10,12 +10,14 @@ type MapNode interface {
     //getters and setters for humidity and biome
     Neighbours() []MapNode
     Modified() bool
+    GetDeltaHeight() int
 }
 
 type TileMapNode struct {
     height int
     neighbours []MapNode
     Mod bool
+    lastHeight int
 }
 
 func NewTileMapNode(height int) TileMapNode {
@@ -37,9 +39,14 @@ func (n *TileMapNode) GetHeight() int {
 }
 
 func (n *TileMapNode) SetHeight(height int) {
+    n.lastHeight = n.height
     n.height = height
 }
 
 func (n *TileMapNode) Neighbours() []MapNode {
     return n.neighbours[:]
+}
+
+func (n *TileMapNode) GetDeltaHeight() int {
+    return n.height - n.lastHeight
 }

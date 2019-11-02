@@ -20,5 +20,6 @@ type MapState interface {
     MaxHeight() int
     MinHeight() int
     GetIterator() MapIterator
+    UpdateExtrema()
     //add ctl function if necessary
 }

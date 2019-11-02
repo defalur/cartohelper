@@ -39,6 +39,8 @@ func updateMap(mapState mapstate.MapState, integral, heightMap [][]float64, rate
         }
         //fmt.Println("")
     }
+    
+    mapState.UpdateExtrema()
 }
 
 func SimpleErosion(mapState mapstate.MapState, rate float64) {

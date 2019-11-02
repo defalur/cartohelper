@@ -228,3 +228,22 @@ func (state *TileMapState) MinHeight() int {
 func (state *TileMapState) GetIterator() MapIterator {
     return newTileMapIterator(state)
 }
+
+func (state * TileMapState) UpdateExtrema() {
+    minHeight := state.nodes[0][0].GetHeight()
+    maxHeight := state.nodes[0][0].GetHeight()
+    
+    for i := 0; i < state.height; i++ {
+        for j := 0; j < state.width; j++ {
+            if state.nodes[i][j].GetHeight() < minHeight {
+                minHeight = state.nodes[i][j].GetHeight()
+            }
+            if state.nodes[i][j].GetHeight() > maxHeight {
+                maxHeight = state.nodes[i][j].GetHeight()
+            }
+        }
+    }
+    
+    state.minHeight = minHeight
+    state.maxHeight = maxHeight
+}
