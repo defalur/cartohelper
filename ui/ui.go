@@ -39,9 +39,6 @@ func NewUi(mapWidget *mapWidget.MapWidget) *SimpleUi {
     heightViewer := mapviewer.NewHeightMapViewer()
     heightViewer.RegisterMap(mapWidget.MapViewer.MapState())
     
-    erosionViewer := mapviewer.NewErosionMapViewer()
-    erosionViewer.RegisterMap(mapWidget.MapViewer.MapState())
-    
     w := mapWidget.MapViewer.MapState().GetWidth()
     h := mapWidget.MapViewer.MapState().GetHeight()
     
@@ -60,10 +57,6 @@ func NewUi(mapWidget *mapWidget.MapWidget) *SimpleUi {
     }))
     result.menu.Append(widget.NewButton("Height Viewer", func() {
         mapWidget.MapViewer = heightViewer
-        widget.Refresh(mapWidget)
-    }))
-    result.menu.Append(widget.NewButton("Erosion Viewer", func() {
-        mapWidget.MapViewer = erosionViewer
         widget.Refresh(mapWidget)
     }))
     result.menu.Append(widget.NewButton("Save", func() {
