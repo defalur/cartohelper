@@ -23,3 +23,11 @@ I also tried using only the fluid simulation without erosion to place rivers but
 ## Conclusion
 
 This project has been put on hold for the time being because I don't really have a solution for placing rivers. I might come back to it if I find something.
+
+# Examples of generated terrain
+
+A map with the default visualisation.
+![Default viewer](imgstore/2.png)
+
+A map with the height visualisation.
+![Height viewer](imgstore/1.png)
