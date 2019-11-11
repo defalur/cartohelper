@@ -11,6 +11,8 @@ type MapNode interface {
     Neighbours() []MapNode
     Modified() bool
     GetDeltaHeight() int
+    SetFlow(float64)
+    GetFlow() float64
 }
 
 type TileMapNode struct {
@@ -18,6 +20,7 @@ type TileMapNode struct {
     neighbours []MapNode
     Mod bool
     lastHeight int
+    flow float64
 }
 
 func NewTileMapNode(height int) TileMapNode {
@@ -49,4 +52,12 @@ func (n *TileMapNode) Neighbours() []MapNode {
 
 func (n *TileMapNode) GetDeltaHeight() int {
     return n.height - n.lastHeight
+}
+
+func (n *TileMapNode) SetFlow(value float64) {
+    n.flow = value
+}
+
+func (n *TileMapNode) GetFlow() float64 {
+    return n.flow
 }

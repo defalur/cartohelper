@@ -16,6 +16,7 @@ type TileMapState struct {
     height int
     maxHeight int
     minHeight int
+    maxFlow float64
 }
 
 type TileMapIterator struct {
@@ -232,6 +233,7 @@ func (state *TileMapState) GetIterator() MapIterator {
 func (state * TileMapState) UpdateExtrema() {
     minHeight := state.nodes[0][0].GetHeight()
     maxHeight := state.nodes[0][0].GetHeight()
+    maxFlow := state.nodes[0][0].GetFlow()
     
     for i := 0; i < state.height; i++ {
         for j := 0; j < state.width; j++ {
@@ -241,9 +243,17 @@ func (state * TileMapState) UpdateExtrema() {
             if state.nodes[i][j].GetHeight() > maxHeight {
                 maxHeight = state.nodes[i][j].GetHeight()
             }
+            if state.nodes[i][j].GetFlow() > maxFlow {
+                maxFlow = state.nodes[i][j].GetFlow()
+            }
         }
     }
     
     state.minHeight = minHeight
     state.maxHeight = maxHeight
+    state.maxFlow = maxFlow
+}
+
+func (state *TileMapState) MaxFlow() float64 {
+    return state.maxFlow
 }

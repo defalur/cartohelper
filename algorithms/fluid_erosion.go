@@ -5,9 +5,10 @@ import (
     "cartohelper/mapState"
     "math"
     "fmt"
+    "math/rand"
 )
 
-var startingWater float64 = 1.0
+var startingWater float64 = 5.0
 var waterLimit float64 = 64
 var deltaTime float64 = 0.1
 //pipe cross section
@@ -21,15 +22,15 @@ var lx float64 = 1
 //height of tiles
 var ly float64 = 1
 //sediment capacity constant
-var Kc float64 = 0.1
+var Kc float64 = 0.2
 //dissolving constant
-var Ks float64 = 0.1
+var Ks float64 = 0.2
 //sediment deposition constant
-var Kd float64 = 0.1
+var Kd float64 = 0.2
 //minimum terrain tilt constant
-var minTilt float64 = 0.0001
+var minTilt float64 = 0.01
 //evaporation constant
-var Ke float64 = 5.0
+var Ke float64 = 1
 
 type tileData struct {
     totalFlow float64//total quantity of water that passed through the tile
@@ -147,6 +148,7 @@ func updateWaterLvl(i, j int, mapData [][]tileData, h, w int) {
     deltaWy := (inTop - mapData[i][j].outTop + mapData[i][j].outBot - inBot) / 2
     mapData[i][j].velx = deltaWx / (levelAvg * ly)
     mapData[i][j].vely = deltaWy / (levelAvg * lx)
+    mapData[i][j].totalFlow += flowOut
 }
 
 func computeGrad(a, b, d float64) float64 {
@@ -330,6 +332,34 @@ func initData(mapState mapstate.MapState) [][]tileData {
     return result
 }
 
+func initDataRiver(mapState mapstate.MapState, lowLimit, waterLevel float64) ([][]tileData, int,
+                                                                              int) {
+    result :=  make([][]tileData, mapState.GetHeight())
+    for i := 0; i < mapState.GetHeight(); i++ {
+        result[i] = make([]tileData, mapState.GetWidth())
+        
+        for j := 0; j < mapState.GetWidth(); j++ {
+            node, _ := mapState.GetNode(j, i)
+            result[i][j].height = float64(node.GetHeight())
+            result[i][j].water = 0
+            result[i][j].totalFlow = node.GetFlow()
+        }
+    }
+    
+    i_source := rand.Intn(mapState.GetHeight())
+    j_source := rand.Intn(mapState.GetWidth())
+    source_height := result[i_source][j_source].height
+    for source_height < lowLimit{
+        i_source = rand.Intn(mapState.GetHeight())
+        j_source = rand.Intn(mapState.GetWidth())
+        source_height = result[i_source][j_source].height
+    }
+    
+    result[i_source][j_source].water = waterLevel
+    
+    return result, i_source, j_source
+}
+
 func updateMapFluid(mapState mapstate.MapState, mapData [][]tileData) {
     for i := 0; i < mapState.GetHeight(); i++ {
         for j := 0; j < mapState.GetWidth(); j++ {
@@ -338,6 +368,7 @@ func updateMapFluid(mapState mapstate.MapState, mapData [][]tileData) {
                 break
             }
             node.SetHeight(int(math.Round(mapData[i][j].height)))
+            node.SetFlow(mapData[i][j].totalFlow)
         }
     }
     mapState.UpdateExtrema()
@@ -376,5 +407,27 @@ func FluidErosion(mapState mapstate.MapState) {
     //}end loop
     }
     //update mapState
+    updateMapFluid(mapState, mapData)
+}
+
+/*Place river with no erosion or low erosion*/
+func RiverPlacement(mapState mapstate.MapState, cycles int, lowLimit, waterLevel float64) {
+    mapData, i_source, j_source := initDataRiver(mapState, lowLimit, waterLevel)
+    
+    fmt.Println("Height low: ", lowLimit)
+    fmt.Println("Height source: ", mapData[i_source][j_source].height)
+    var cur_cycles int = 0
+    for ;cur_cycles < cycles; cur_cycles++ {
+        mapData[i_source][j_source].water = waterLevel
+        fmt.Println("Cycle: ", cur_cycles)
+        iterate(mapData, mapState.GetHeight(), mapState.GetWidth(), computeOutFlux)
+        iterate(mapData, mapState.GetHeight(), mapState.GetWidth(), updateWaterLvl)
+        iterate(mapData, mapState.GetHeight(), mapState.GetWidth(), computeErosion)
+        iterate(mapData, mapState.GetHeight(), mapState.GetWidth(), sedimentTransport)
+        iterate(mapData, mapState.GetHeight(), mapState.GetWidth(), updateHeight)
+        iterate(mapData, mapState.GetHeight(), mapState.GetWidth(), updateSediment)
+        iterate(mapData, mapState.GetHeight(), mapState.GetWidth(), evaporate)
+    }
+    
     updateMapFluid(mapState, mapData)
 }

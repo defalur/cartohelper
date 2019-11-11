@@ -6,6 +6,8 @@ import (
     "math"
 )
 
+var flowLimit float64 = 0.1
+
 type HeightMapViewer struct {
     mapState mapstate.MapState
     lowGround color.RGBA//close to sea level
@@ -43,28 +45,32 @@ func (viewer *HeightMapViewer) GetPixel(x, y int) color.Color {
     
     minHeight := viewer.mapState.MinHeight()
     maxHeight := viewer.mapState.MaxHeight()
+    maxFlow := viewer.mapState.MaxFlow()
+    riverLimit := flowLimit * maxFlow
     
     node, err := viewer.mapState.GetNode(x, y)
     if err != nil {
         return color.RGBA{0, 0, 0, 255}//black for all pixels outside of map
     }
     curHeight := node.GetHeight()
-    if curHeight > 0 {
-        //ground
-        c1 := viewer.lowGround
-        c2 := viewer.highGround
-        r := interpolate(c1.R, c2.R, maxHeight, curHeight)
-        g := interpolate(c1.G, c2.G, maxHeight, curHeight)
-        b := interpolate(c1.B, c2.B, maxHeight, curHeight)
-        
-        return color.RGBA{r, g, b, 255}
-    } else {
+    if curHeight <= 0{
         //sea
         c1 := viewer.lowSea
         c2 := viewer.highSea
         r := interpolate(c1.R, c2.R, minHeight, curHeight)
         g := interpolate(c1.G, c2.G, minHeight, curHeight)
         b := interpolate(c1.B, c2.B, minHeight, curHeight)
+        
+        return color.RGBA{r, g, b, 255}
+    } else if node.GetFlow() > riverLimit {
+        return color.RGBA{0, 0, 0, 255}
+    } else {
+        //ground
+        c1 := viewer.lowGround
+        c2 := viewer.highGround
+        r := interpolate(c1.R, c2.R, maxHeight, curHeight)
+        g := interpolate(c1.G, c2.G, maxHeight, curHeight)
+        b := interpolate(c1.B, c2.B, maxHeight, curHeight)
         
         return color.RGBA{r, g, b, 255}
     }

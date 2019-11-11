@@ -113,7 +113,8 @@ func NewUi(mapWidget *mapWidget.MapWidget) *SimpleUi {
         widget.Refresh(mapWidget)
     }))
     result.menu.Append(widget.NewButton("Erosion", func() {
-        algorithms.FluidErosion(mapWidget.MapViewer.MapState())
+        algorithms.RiverPlacement(mapWidget.MapViewer.MapState(), 1000,
+                                  float64(mapWidget.MapViewer.MapState().MaxHeight()) * 0.80, 100)
         widget.Refresh(mapWidget)
     }))
     
