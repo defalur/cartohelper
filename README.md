@@ -16,7 +16,7 @@ Thus, when generating a new continent, some distribution centers are added, crea
 ## What does not really work
 
 My next objective for this project was to place rivers on the map.
-In order to acheive that, I implemented shallow water simulation based on [this](http://www-ljk.imag.fr/Publications/Basilic/com.lmc.publi.PUBLI_Inproceedings@117681e94b6_fff75c/FastErosion_PG07.pdf) paper. The simulation seems to work but the erosion did not give
+In order to acheive that, I implemented shallow water simulation based on [this](https://inria.hal.science/inria-00402079) paper. The simulation seems to work but the erosion did not give
 satisfactory results.
 I also tried using only the fluid simulation without erosion to place rivers but the results were not great either.
 
